@@ -1,0 +1,57 @@
+version: "3.8"
+services:
+
+  mysql:
+    image: jonacruz/mysql:8.0.23
+    container_name: mysql
+    restart: always
+    tty: true
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - "4001:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+
+  nginx:
+    image: jonacruz/nginx
+    container_name: nginx
+    restart: always
+    tty: true
+    ports:
+      - "80:80"
+    environment:
+      VIRTUAL_HOST: 'docker.local'
+      LETSENCRYPT_HOST: 'docker.local'
+      LETSENCRYPT_EMAIL: 'jonathan.cruz89@gmail.com'
+      APP_FASTCGI_PASS: 'php:9000'
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+      - php
+  
+  php:
+    image: jonacruz/php-fpm:8.0.5
+    container_name: php
+    tty: true
+    restart: always
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+      - mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: myadmin
+    environment:
+      PMA_HOST: ${PHP_PMA_HOST}
+      PMA_PORT: ${PHP_PMA_PORT}
+      UPLOAD_LIMIT: 50M
+    ports:
+      - "8008:80"
+    volumes:
+      - /sessions
+    depends_on:
+      - mysql
