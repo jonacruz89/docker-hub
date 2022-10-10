@@ -33,7 +33,8 @@ services:
       - php
   
   php:
-    image: jonacruz/php-fpm:8.0.5
+    build:
+      context: ./php
     container_name: php
     tty: true
     restart: always
