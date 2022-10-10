@@ -1,4 +1,4 @@
-FROM php:8.0.5-fpm
+FROM php:8.1.11-fpm
 
 RUN apt-get update && apt-get install -y wget cron supervisor libzip-dev zip libpq-dev libpng-dev
 
