@@ -1,5 +1,8 @@
 FROM nginx:latest
 
+#Default php container
+ENV APP_FASTCGI_PASS=php:9000
+
 COPY ./default.conf /etc/nginx/conf.d/default.conf
 COPY ./default.conf.template /etc/nginx/conf.d/default.conf.template
 
