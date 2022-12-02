@@ -28,8 +28,8 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 
 COPY --from=composer:2.4.0 /usr/bin/composer /usr/bin/composer
 
-COPY php_conf.ini /usr/local/etc/php/conf.d/990-custom.ini
-
 RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+COPY php_conf.ini /usr/local/etc/php/conf.d/990-custom.ini
  
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
