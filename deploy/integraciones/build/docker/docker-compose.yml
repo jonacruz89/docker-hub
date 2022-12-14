@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+
+  integraciones-nginx:
+    image: jonacruz/nginx
+    environment:
+      APP_FASTCGI_PASS: 'integraciones-php:9000'
+    depends_on:
+      - integraciones-php
+
+  integraciones-php:
+    build:
+      context: ../../
+    container_name: integraciones-php
+    depends_on:
+      - mysql
