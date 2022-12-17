@@ -31,5 +31,12 @@ COPY --from=composer:2.4.0 /usr/bin/composer /usr/bin/composer
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 COPY php_conf.ini /usr/local/etc/php/conf.d/990-custom.ini
+
+ARG PHP_SECURITY_CHECKER_HASH="90cc98e306a91d5a3fa3ccdf20e428e21a8e62cc8a8994863c34e864475bbf1e"
+ARG PHP_SECURITY_CHECKER_VERSION="2.0.6"
+RUN wget "https://github.com/fabpot/local-php-security-checker/releases/download/v${PHP_SECURITY_CHECKER_VERSION}/local-php-security-checker_${PHP_SECURITY_CHECKER_VERSION}_linux_386" -nv -O local-php-security-checker \
+  && echo "${PHP_SECURITY_CHECKER_HASH}  local-php-security-checker" | sha256sum -c - \
+  && chmod +x local-php-security-checker \
+  && mv local-php-security-checker /usr/local/bin/local-php-security-checker
  
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
