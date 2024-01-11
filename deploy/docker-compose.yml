@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+
+  http:
+    image: traefik:v2.9
+    container_name: http
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mysql:
+    image: jonacruz/mysql:8.0.23
+    container_name: mysql
+    restart: always
+    tty: true
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - "4001:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: integraciones
+      MYSQL_PASSWORD: integraciones
+    entrypoint: sh -c " echo \"CREATE DATABASE IF NOT EXISTS integraciones; CREATE DATABASE IF NOT EXISTS integraciones_test; GRANT ALL PRIVILEGES ON *.* TO 'integraciones'@'%';\" > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --sql_mode="" --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci "
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: myadmin
+    environment:
+      PMA_HOST: ${PHP_PMA_HOST}
+      PMA_PORT: ${PHP_PMA_PORT}
+      UPLOAD_LIMIT: 50M
+    volumes:
+      - /sessions
+    depends_on:
+      - mysql
+    labels:
+      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.local`)"
+
+  # Integraciones
+
+  integraciones-nginx:
+    image: jonacruz/nginx
+    container_name: integraciones-nginx
+    restart: always
+    tty: true
+    volumes:
+      - ./integraciones:/var/www/html
+    labels:
+      - "traefik.http.routers.integraciones-nginx.rule=Host(`integraciones.local`)"
+
+  integraciones-php:
+    build:
+      context: ./integraciones
+    container_name: integraciones-php
+    restart: always
+    tty: true
+    volumes:
+      - ./integraciones:/var/www/html
+    depends_on:
+      - mysql

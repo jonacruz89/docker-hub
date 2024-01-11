@@ -2,7 +2,8 @@ version: "3.8"
 services:
 
   mysql:
-    image: jonacruz/mysql:8.0.23
+    build:
+      context: ./mysql
     container_name: mysql
     restart: always
     tty: true
@@ -16,7 +17,8 @@ services:
       MYSQL_PASSWORD: docker
 
   nginx:
-    image: jonacruz/nginx
+    build:
+      context: ./nginx
     container_name: nginx
     restart: always
     tty: true
@@ -33,7 +35,8 @@ services:
       - php
   
   php:
-    image: jonacruz/php-fpm:8.0.5
+    build:
+      context: ./php
     container_name: php
     tty: true
     restart: always

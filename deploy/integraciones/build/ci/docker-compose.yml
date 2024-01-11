@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+
+  integraciones-ci:
+    build:
+      context: ../../
+    entrypoint: "dockerize -wait tcp://mysql:3306 -timeout 60s composer ci"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: 'mysql:8.0.23'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: integraciones
+      MYSQL_PASSWORD: integraciones
+      MYSQL_INITDB_SKIP_TZINFO: 1
+    entrypoint: sh -c " echo \"CREATE DATABASE IF NOT EXISTS integraciones_test; GRANT ALL PRIVILEGES ON *.* TO 'integraciones'@'%';\" > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --sql_mode="" --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci "
