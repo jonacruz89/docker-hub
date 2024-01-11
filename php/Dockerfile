@@ -1,4 +1,4 @@
-FROM php:8.0.5-fpm
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y wget cron supervisor libzip-dev zip libpq-dev libpng-dev
 
@@ -18,7 +18,7 @@ RUN crontab /etc/cron.d/scheduler
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Install Node
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs build-essential
 
 ENV DOCKERIZE_VERSION v0.6.1
@@ -26,6 +26,6 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY --from=composer:2.4.0 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.6.6 /usr/bin/composer /usr/bin/composer
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
